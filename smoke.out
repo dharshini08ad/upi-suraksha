@@ -1,0 +1,15 @@
+﻿
+> upi-suraksha@2.0.0 smoke
+> esbuild scripts/render-smoke.tsx --bundle --platform=node --format=cjs --jsx=automatic --outfile=node_modules/.cache/render-smoke.cjs --log-level=error && node node_modules/.cache/render-smoke.cjs
+
+ok    Home (17818 chars)
+ok    Scan QR (4096 chars)
+ok    Payment link (8844 chars)
+ok    UPI ID (8758 chars)
+ok    404 (7083 chars)
+ok    Report (high risk, 91) (16453 chars)
+ok    Report (low risk, 0) (14102 chars)
+ok    Alert (high risk) (10571 chars)
+ok    Alert (low risk) (9556 chars)
+
+All routes render.

@@ -1,0 +1,96 @@
+/* =========================================================
+   UPI SURAKSHA — DESIGN TOKENS
+   Razorpay-style navy authority + GPay's four accent colours,
+   applied as flat blocks. No gradients.
+   ========================================================= */
+
+:root {
+  /* ---- Brand: deep navy (Razorpay-style authority) ---- */
+  --navy-950: #061a33;
+  --navy-900: #0c2340; /* primary */
+  --navy-800: #123457;
+  --navy-700: #1b4a78;
+  --navy-600: #2a5f96;
+
+  /* ---- Primary action: GPay blue ---- */
+  --blue-700: #1257c8;
+  --blue-600: #1a73e8;
+  --blue-500: #4285f4;
+  --blue-300: #8ab4f8;
+  --blue-100: #e3edfd;
+  --blue-050: #f3f7fe;
+
+  /* ---- Suraksha green: verified / low risk ---- */
+  --ok-800: #0a5c37;
+  --ok-700: #0b7a4b;
+  --ok-600: #12a05c;
+  --ok-500: #34c07a;
+  --ok-100: #e3f5ea;
+  --ok-050: #f1fbf5;
+
+  /* ---- Suraksha amber: needs review / medium risk ---- */
+  --warn-800: #7a4b00;
+  --warn-700: #9a5f00;
+  --warn-600: #e8a400;
+  --warn-500: #ffc53d;
+  --warn-100: #fdf3dc;
+  --warn-050: #fefaf0;
+
+  /* ---- Suraksha red: blocked / high risk ---- */
+  --risk-800: #8c1d18;
+  --risk-700: #b0231b;
+  --risk-600: #d93025;
+  --risk-500: #f2645a;
+  --risk-100: #fce8e6;
+  --risk-050: #fef5f4;
+
+  /* ---- Surfaces & lines ---- */
+  --white: #ffffff;
+  --paper: #f2f5fa;
+  --paper-alt: #eaeff7;
+  --line: #dde4ee;
+  --line-strong: #c2cddd;
+  --line-navy: #22406b;
+
+  /* ---- Text ---- */
+  --ink: #0e1a2b;
+  --ink-2: #384761;
+  --ink-3: #64748d;
+  --ink-inv: #ffffff;
+  --ink-inv-2: #b4c6e0;
+
+  /* ---- Indian flag tricolour ---- */
+  --flag-saffron: #ff9933;
+  --flag-white: #ffffff;
+  --flag-green: #138808;
+  --flag-chakra: #0c2340;
+
+  /* ---- Geometry ---- */
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(12, 35, 64, 0.06);
+  --shadow-2: 0 3px 14px rgba(12, 35, 64, 0.09);
+  --shadow-3: 0 12px 34px rgba(12, 35, 64, 0.14);
+  --shadow-brand: 0 6px 20px rgba(26, 115, 232, 0.18);
+
+  /* ---- Type ---- */
+  --font-sans: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-dev: "Noto Sans Devanagari", var(--font-sans);
+  --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* ---- Layout ---- */
+  --header-h: 68px;
+  --util-h: 34px;
+  --page-max: 1160px;
+  --page-max-narrow: 780px;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --header-h: 62px;
+  }
+}
