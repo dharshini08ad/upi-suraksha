@@ -16,7 +16,6 @@ import { analyzeQrImage, analyzeQrPayload } from '../lib/api'
 import type { QrAnalysisResult } from '../lib/api'
 
 type CameraState = 'idle' | 'starting' | 'live' | 'denied' | 'unsupported' | 'error'
-const REAR_CAMERA_LABEL = /back|rear|environment|world/i
 
 const IDLE_COPY: Record<CameraState, string> = {
   idle: 'The camera has not been started.',
@@ -25,6 +24,39 @@ const IDLE_COPY: Record<CameraState, string> = {
   denied: 'Camera access was refused. Allow it in your browser settings and try again.',
   unsupported: 'Camera access is unavailable. Open this page on HTTPS or localhost and check that a camera is connected.',
   error: 'The camera could not start. Close other apps using it, then try again.',
+}
+
+async function decodeQrFile(file: File): Promise<string | null> {
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const bitmap = await createImageBitmap(file)
+      try {
+        return decodeQr(bitmap, bitmap.width, bitmap.height)
+      } finally {
+        bitmap.close()
+      }
+    } catch {
+      // Fall back to an image element for browsers that cannot create a bitmap.
+    }
+  }
+
+  const imageUrl = URL.createObjectURL(file)
+  try {
+    return await new Promise((resolve) => {
+      const image = new Image()
+      image.onload = () => {
+        try {
+          resolve(decodeQr(image, image.naturalWidth, image.naturalHeight))
+        } catch {
+          resolve(null)
+        }
+      }
+      image.onerror = () => resolve(null)
+      image.src = imageUrl
+    })
+  } finally {
+    URL.revokeObjectURL(imageUrl)
+  }
 }
 
 export function ScanScreen() {
@@ -111,32 +143,6 @@ export function ScanScreen() {
       }
       streamRef.current = stream
 
-      const devices = await navigator.mediaDevices.enumerateDevices().catch(() => [])
-      const rearCamera = devices.find(
-        (device) =>
-          device.kind === 'videoinput' &&
-          device.deviceId !== stream.getVideoTracks()[0]?.getSettings().deviceId &&
-          REAR_CAMERA_LABEL.test(device.label),
-      )
-      if (rearCamera) {
-        try {
-          const rearStream = await navigator.mediaDevices.getUserMedia({
-            video: { deviceId: { exact: rearCamera.deviceId }, width: { ideal: 1280 } },
-            audio: false,
-          })
-          if (!mountedRef.current || cameraAttemptRef.current !== attempt) {
-            rearStream.getTracks().forEach((track) => track.stop())
-            stream.getTracks().forEach((track) => track.stop())
-            return
-          }
-          stream.getTracks().forEach((track) => track.stop())
-          stream = rearStream
-          streamRef.current = stream
-        } catch {
-          // Keep the working environment-facing stream if a labeled device cannot be reopened.
-        }
-      }
-
       if (!mountedRef.current || cameraAttemptRef.current !== attempt) {
         stream.getTracks().forEach((track) => track.stop())
         return
@@ -193,17 +199,7 @@ export function ScanScreen() {
     stopCamera()
     setCamera('idle')
     try {
-      let payload: string | null = null
-      try {
-        const bitmap = await createImageBitmap(file)
-        try {
-          payload = decodeQr(bitmap, bitmap.width, bitmap.height)
-        } finally {
-          bitmap.close()
-        }
-      } catch {
-        payload = null
-      }
+      const payload = await decodeQrFile(file)
       const analysis = payload ? await analyzeQrPayload(payload) : await analyzeQrImage(file)
       setHit(payload ?? analysis.analyzed_value)
       setResult(analysis)
@@ -217,17 +213,17 @@ export function ScanScreen() {
   return (
     <>
       <Stepper current={0} />
-      <div className="container page">
+      <div className="container page page--scan">
         <header className="page__head">
-          <span className="eyebrow">Step 1 &middot; Input</span>
+          <span className="eyebrow">UPI payment safety</span>
           <h1 className="page__title">Scan a UPI QR code</h1>
           <p className="page__lede">
-            Scan with your device camera or upload a QR image. The decoded request is checked by the
-            fraud analysis service.
+            Scan a UPI code with your camera or choose a saved image. We’ll read the payee and amount,
+            then flag patterns that deserve a closer look.
           </p>
         </header>
 
-        <div className="scanner">
+        <div className={`scanner${camera === 'live' ? ' scanner--live' : ''}`}>
           <video ref={videoRef} className="scanner__video" playsInline muted />
 
           {camera === 'live' ? null : (
@@ -261,7 +257,7 @@ export function ScanScreen() {
                     ? 'No code yet. Fit the whole QR inside the corners and raise your phone screen brightness.'
                     : camera === 'live'
                       ? 'Scanning. Hold the code steady inside the frame.'
-                    : 'Align the QR code inside the frame'}
+                          : 'Align the QR code inside the frame'}
           </p>
         </div>
 
@@ -326,6 +322,11 @@ export function ScanScreen() {
                 <small>{result.risk_level} RISK</small>
               </div>
             </div>
+
+            <p className="qr-result__source-note">
+              {result.analysis_source === 'local' ? 'On-device pattern check.' : 'Pattern-based analysis.'} It cannot
+              confirm account ownership or guarantee safety; verify the payee and amount in your UPI app before paying.
+            </p>
 
             <dl className="qr-result__details">
               {result.recipient_info.payee_name ? <div><dt>Payee</dt><dd>{result.recipient_info.payee_name}</dd></div> : null}

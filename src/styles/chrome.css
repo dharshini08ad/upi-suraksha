@@ -249,6 +249,8 @@
 .stepper__inner {
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -391,6 +393,21 @@
 @media (max-width: 640px) {
   .step {
     margin-right: 16px;
+    font-size: 10.5px;
+  }
+
+  .footer .nowrap {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 360px) {
+  .utilbar__org .utilbar__divider,
+  .utilbar__org > span:last-child {
+    display: none;
+  }
+
+  .utilbar__inner {
     font-size: 10.5px;
   }
 }

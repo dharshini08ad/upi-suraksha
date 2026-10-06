@@ -260,8 +260,41 @@
   line-height: 1.6;
 }
 
+.page--scan {
+  max-width: 860px;
+}
+
+.page--scan .page__head {
+  max-width: 620px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.page--scan .page__head .eyebrow {
+  justify-content: center;
+}
+
 .form-panel {
   max-width: 720px;
+}
+
+@media (max-width: 600px) {
+  .page--scan {
+    padding-top: 20px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .page--scan .page__head {
+    margin-bottom: 18px;
+  }
+
+  .page--scan .page__title {
+    font-size: 26px;
+  }
+
+  .page--scan .page__lede {
+    font-size: 14px;
+  }
 }
 
 .form-panel__body {

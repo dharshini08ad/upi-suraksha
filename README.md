@@ -4,7 +4,9 @@ A frontend prototype and standalone FastAPI backend for a UPI fraud detection pl
 `INPUT → ANALYZE → RISK SCORE → ALERT → ACTION`.
 
 The frontend decodes QR codes in the browser and sends them to the FastAPI backend
-for local risk analysis. Payment-link and UPI-ID screens retain their browser rules.
+for risk analysis. If the backend is unavailable, QR payloads use the browser's
+local rules and are clearly marked as on-device heuristic results. Payment-link
+and UPI-ID screens retain their browser rules.
 
 ## Run it
 
@@ -53,6 +55,11 @@ service with root directory `.`, build command
 `https://upi-suraksha.vercel.app`. Add any extra trusted origins as a
 comma-separated list; wildcard CORS is rejected.
 
+The frontend falls back to local QR checks if the API URL is missing or the
+service cannot be reached. Set `VITE_API_URL` in Vercel and redeploy to use the
+hosted backend. Camera access on a phone requires HTTPS; use the deployed HTTPS
+site rather than the Vite server's plain-HTTP LAN address.
+
 `VITE_API_URL` is a public frontend build-time URL, not a secret. Do not place
 API keys or credentials in Vite environment variables. `.env.example` lists the
 local values; configure production values in the Vercel and Render dashboards.
@@ -82,7 +89,9 @@ different one: *UPI Vishwas* (विश्वास, trust), *UPI Rakshak*, *Pay
 The scanner decodes **live** with `jsQR` on a `requestAnimationFrame` loop
 (`src/lib/qr.ts`). When a code is found the camera is stopped and the payload is
 analysed automatically. The same decoder handles uploaded images, so it works on
-desktops where the native `BarcodeDetector` API is unavailable.
+desktops where the native `BarcodeDetector` API is unavailable. When the API is
+not reachable, browser-side results are labelled as heuristics and do not verify
+account ownership or guarantee that a payment is safe.
 
 Because the decoder is ~50 kB gzipped, the scan route is lazy-loaded — the first
 paint never pays for it.
