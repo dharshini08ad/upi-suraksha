@@ -70,7 +70,7 @@ export function Emblem({ size = 38 }: { size?: number }) {
       aria-label="UPI Suraksha emblem"
       className="brand__emblem"
     >
-      <rect width="48" height="48" rx="6" fill="var(--navy-900)" />
+      <rect width="48" height="48" rx="6" fill="var(--blue-600)" />
       <path
         d="M24 6.5 40 12.6v11.9c0 9-6.6 15.3-16 18.6-9.4-3.3-16-9.6-16-18.6V12.6Z"
         fill="none"

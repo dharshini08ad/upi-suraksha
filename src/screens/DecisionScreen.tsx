@@ -34,7 +34,7 @@ const OUTCOME = {
 const SEAL: Record<string, string> = {
   HIGH: 'Security alert',
   MEDIUM: 'Advisory notice',
-  LOW: 'Verification passed',
+  LOW: 'No high-risk patterns',
 }
 
 export function DecisionScreen() {
@@ -65,7 +65,7 @@ export function DecisionScreen() {
                   ? 'Payment Risk Detected'
                   : analysis.band === 'MEDIUM'
                     ? 'Confirm this payment first'
-                    : 'Payment appears safe'}
+                    : 'No high-risk patterns detected'}
               </h1>
               <p className="alert__sub">{copy.summary}</p>
             </header>

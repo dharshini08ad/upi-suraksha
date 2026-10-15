@@ -35,7 +35,7 @@ export function AppHeader() {
             <span>{BRAND.programme}</span>
           </span>
           <span className="utilbar__meta">
-            <span>UPI Interoperability</span>
+            <span>Simulated wallet</span>
             <span className="utilbar__divider" aria-hidden="true">
               |
             </span>

@@ -23,6 +23,33 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ---------- Aurora background: soft blue-green gradients + flowing blobs ---------- */
+
+.app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(120, 175, 255, 0.28), transparent 60%),
+    radial-gradient(900px 620px at 100% 0%, rgba(120, 235, 190, 0.24), transparent 58%),
+    radial-gradient(1000px 700px at 50% 115%, rgba(150, 200, 255, 0.2), transparent 60%),
+    linear-gradient(160deg, #f6fbff 0%, #f4f7fb 45%, #f2faf5 100%);
+}
+
+.app::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(360px 360px at 18% 22%, rgba(74, 142, 242, 0.14), transparent 70%),
+    radial-gradient(420px 420px at 82% 30%, rgba(63, 195, 126, 0.13), transparent 70%),
+    radial-gradient(320px 320px at 60% 82%, rgba(255, 154, 60, 0.1), transparent 70%);
+  animation: floatY 16s ease-in-out infinite;
+}
+
 #root {
   min-height: 100vh;
   display: flex;
@@ -173,15 +200,16 @@ code,
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 44px;
-  padding: 0 20px;
+  min-height: 46px;
+  padding: 0 22px;
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-pill);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
   text-align: center;
-  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  transition: transform 0.16s var(--ease-pop), box-shadow 0.16s var(--ease-soft),
+    background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
   text-decoration: none;
 }
 
@@ -195,63 +223,80 @@ code,
 }
 
 .btn--primary {
-  background: var(--blue-600);
-  border-color: var(--blue-600);
+  background: var(--grad-primary);
+  border-color: transparent;
   color: #fff;
+  box-shadow: var(--shadow-brand);
 }
 .btn--primary:hover:not(:disabled) {
-  background: var(--blue-700);
-  border-color: var(--blue-700);
+  background: var(--grad-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(26, 115, 232, 0.32);
 }
 
 .btn--navy {
-  background: var(--navy-900);
-  border-color: var(--navy-900);
+  background: var(--grad-primary);
+  border-color: transparent;
   color: #fff;
+  box-shadow: var(--shadow-brand);
 }
 .btn--navy:hover:not(:disabled) {
-  background: var(--navy-800);
-  border-color: var(--navy-800);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(26, 115, 232, 0.32);
 }
 
 .btn--outline {
-  background: #fff;
-  border-color: var(--navy-600);
-  color: var(--navy-900);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-color: var(--line-navy);
+  color: var(--navy-800);
 }
 .btn--outline:hover:not(:disabled) {
-  background: var(--blue-050);
-  border-color: var(--navy-900);
+  background: #fff;
+  border-color: var(--blue-600);
+  color: var(--blue-700);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
 }
 
 .btn--quiet {
-  background: #fff;
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border-color: var(--line-strong);
   color: var(--ink-2);
 }
 .btn--quiet:hover:not(:disabled) {
-  background: var(--paper-alt);
+  background: #fff;
   border-color: var(--navy-600);
   color: var(--navy-900);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
 }
 
 .btn--danger {
   background: var(--risk-600);
   border-color: var(--risk-600);
   color: #fff;
+  box-shadow: 0 10px 26px rgba(224, 74, 60, 0.28);
 }
 .btn--danger:hover:not(:disabled) {
   background: var(--risk-700);
   border-color: var(--risk-700);
+  transform: translateY(-2px);
 }
 
 .btn--danger-outline {
-  background: #fff;
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border-color: var(--risk-600);
   color: var(--risk-700);
 }
 .btn--danger-outline:hover:not(:disabled) {
   background: var(--risk-100);
+  transform: translateY(-2px);
 }
 
 .btn--lg {
@@ -317,7 +362,7 @@ code,
 .textarea:focus {
   outline: none;
   border-color: var(--blue-600);
-  box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.12);
+  box-shadow: var(--ring-focus);
 }
 
 .input--mono {

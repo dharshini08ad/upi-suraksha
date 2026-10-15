@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Stepper } from '../components/Stepper'
 import { IconCheck, IconShield } from '../components/Icons'
 import { useSession } from '../state/session'
+import { useAnalytics } from '../state/analytics'
+import { analyzeSubmittedInput } from '../lib/api'
 
 const STAGES = [
   'Reading the payment request',
@@ -14,19 +16,32 @@ const STAGES = [
 
 export function AnalyzingScreen() {
   const { input, complete } = useSession()
+  const { recordScan } = useAnalytics()
   const [stage, setStage] = useState(0)
   const navigate = useNavigate()
+  const submittedRef = useRef(false)
 
   useEffect(() => {
     if (!input) return
     if (stage >= STAGES.length) {
-      complete()
-      navigate('/report', { replace: true })
-      return
+      if (submittedRef.current) return
+      submittedRef.current = true
+      let cancelled = false
+      void analyzeSubmittedInput(input)
+        .catch(() => null)
+        .then((serverResult) => {
+          if (cancelled) return
+          const result = complete(serverResult ?? undefined)
+          if (result) recordScan(result.band !== 'LOW')
+          navigate('/report', { replace: true })
+        })
+      return () => {
+        cancelled = true
+      }
     }
     const id = window.setTimeout(() => setStage((s) => s + 1), stage === STAGES.length - 1 ? 420 : 340)
     return () => window.clearTimeout(id)
-  }, [stage, input, complete, navigate])
+  }, [stage, input, complete, navigate, recordScan])
 
   if (!input) return <Navigate to="/" replace />
 

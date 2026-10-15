@@ -10,15 +10,15 @@
 }
 
 .hero__inner {
-  max-width: 860px;
+  max-width: 1160px;
   margin: 0 auto;
-  padding: 64px 24px 56px;
-  text-align: center;
+  padding: 16px 24px;
+  text-align: left;
 }
 
 .hero__title {
-  margin-top: 18px;
-  font-size: 46px;
+  margin-top: 8px;
+  font-size: 28px;
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
@@ -146,10 +146,10 @@
 
 @media (max-width: 760px) {
   .hero__inner {
-    padding: 40px 16px 36px;
+    padding: 14px 16px;
   }
   .hero__title {
-    font-size: 32px;
+    font-size: 26px;
   }
   .hero__subtitle {
     font-size: 15.5px;

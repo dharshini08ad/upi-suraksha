@@ -8,6 +8,7 @@ import type { ReactElement } from 'react'
 import App from '../src/App'
 import { ScanScreen } from '../src/screens/ScanScreen'
 import { SessionContext } from '../src/state/session'
+import { AnalyticsProvider } from '../src/state/analytics'
 import { analyse } from '../src/lib/riskEngine'
 
 const NOOP = () => undefined
@@ -20,17 +21,19 @@ function render(route: string, payload?: string, direct?: ReactElement) {
   const analysis = payload ? analyse(payload) : null
   return renderToStaticMarkup(
     <StaticRouter location={route}>
-      <SessionContext.Provider
-        value={{
-          input: payload ?? null,
-          analysis,
-          begin: NOOP,
-          complete: NOOP,
-          reset: NOOP,
-        }}
-      >
-        {direct ?? <App />}
-      </SessionContext.Provider>
+      <AnalyticsProvider>
+        <SessionContext.Provider
+          value={{
+            input: payload ?? null,
+            analysis,
+            begin: NOOP,
+            complete: NOOP,
+            reset: NOOP,
+          }}
+        >
+          {direct ?? <App />}
+        </SessionContext.Provider>
+      </AnalyticsProvider>
     </StaticRouter>,
   )
 }
@@ -49,12 +52,17 @@ const CASES: Case[] = [
     name: 'Home',
     route: '/',
     expect: [
-      'Secure Every UPI Payment',
+      'Pay with care.',
+      'local risk rules',
+      'simulated payments',
+      'Bank balance',
+      'Saved contacts',
+      'Total Scans',
+      'Threats Detected',
+      'Transactions Analyzed',
       'Scan QR',
-      'Check Payment Link',
       'Verify UPI ID',
       'UPI Suraksha',
-      'Flag of India',
       'ticker__track',
       'Never share your UPI PIN',
     ],
@@ -90,7 +98,7 @@ const CASES: Case[] = [
     name: 'Alert (low risk)',
     route: '/decision',
     payload: LOW,
-    expect: ['Payment appears safe', 'Continue'],
+    expect: ['No high-risk patterns detected', 'Continue'],
   },
 ]
 

@@ -7,15 +7,15 @@ export const BRAND = {
   /** Devanagari sub-wordmark. */
   nameLocal: 'सुरक्षा',
   /** Line under the wordmark. */
-  tagline: 'National UPI Payment Verification Service',
+  tagline: 'Simulated wallet · local risk checks',
   /** Short form used in tight spaces and the document title. */
   short: 'Suraksha',
   /** Operator shown in the utility bar. */
-  operator: 'National Digital Payments Authority',
+  operator: 'Independent demonstration',
   /** Programme name shown next to the operator. */
-  programme: 'Digital India',
+  programme: 'No bank connection',
   /** Browser tab title suffix. */
-  titleSuffix: 'National UPI Payment Verification Service',
+  titleSuffix: 'Simulated UPI safety demo',
   /** Ruleset version string. */
   ruleset: 'US-4.0.0',
 } as const

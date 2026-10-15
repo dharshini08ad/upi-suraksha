@@ -37,7 +37,6 @@ export function MerchantScreen() {
         <div>
           <h1 className="payhead__name">
             {merchant.name}
-            {merchant.verified ? <span className="tick" aria-label="Verified merchant">✓</span> : null}
           </h1>
           <p className="payhead__vpa mono">{merchant.upiId}</p>
           <p className="payhead__meta">
@@ -75,9 +74,9 @@ export function MerchantScreen() {
           <dd className="kv__dd kv__dd--mono">{merchant.phone}</dd>
         </div>
         <div className="kv__row">
-          <dt className="kv__dt">Registry</dt>
+          <dt className="kv__dt">Listing</dt>
           <dd className="kv__dd">
-            {merchant.verified ? 'Present on the verified merchant list' : 'Not on the verified merchant list'}
+            Local demo listing. Account ownership is not verified.
           </dd>
         </div>
       </dl>

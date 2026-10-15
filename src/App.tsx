@@ -9,6 +9,7 @@ import { SearchScreen } from './screens/SearchScreen'
 import { MerchantScreen } from './screens/MerchantScreen'
 import { PayScreen } from './screens/PayScreen'
 import { HistoryScreen } from './screens/HistoryScreen'
+import { WalletScreen } from './screens/WalletScreen'
 import { LinkScreen } from './screens/LinkScreen'
 import { UpiIdScreen } from './screens/UpiIdScreen'
 import { AnalyzingScreen } from './screens/AnalyzingScreen'
@@ -16,6 +17,7 @@ import { ReportScreen } from './screens/ReportScreen'
 import { DecisionScreen } from './screens/DecisionScreen'
 import { NotFoundScreen } from './screens/NotFoundScreen'
 import { WalletProvider } from './state/wallet'
+import { AnalyticsProvider } from './state/analytics'
 
 /**
  * The scanner pulls in the jsQR decoder (~50 kB gzipped), so it is only
@@ -26,7 +28,7 @@ const ScanScreen = lazy(() =>
 )
 
 /** Routes that keep the GPay-style bottom tab bar visible. */
-const TABBED = ['/', '/search', '/merchant', '/pay', '/history', '/scan']
+const TABBED = ['/', '/search', '/merchant', '/pay', '/history', '/scan', '/wallet']
 
 function RouteFallback() {
   return (
@@ -59,6 +61,8 @@ function Shell() {
           <Route path="/merchant/:id" element={<MerchantScreen />} />
           <Route path="/pay/:id" element={<PayScreen />} />
           <Route path="/history" element={<HistoryScreen />} />
+          <Route path="/wallet" element={<WalletScreen />} />
+          <Route path="/pay/recipient" element={<PayScreen />} />
           <Route
             path="/scan"
             element={
@@ -84,8 +88,10 @@ function Shell() {
 
 export default function App() {
   return (
-    <WalletProvider>
-      <Shell />
-    </WalletProvider>
+    <AnalyticsProvider>
+      <WalletProvider>
+        <Shell />
+      </WalletProvider>
+    </AnalyticsProvider>
   )
 }

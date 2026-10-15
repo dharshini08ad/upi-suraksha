@@ -1,12 +1,11 @@
-# UPI Suraksha — National UPI Payment Verification Service
+# UPI Suraksha — Simulated UPI Wallet and Safety Checks
 
-A frontend prototype and standalone FastAPI backend for a UPI fraud detection platform.
-`INPUT → ANALYZE → RISK SCORE → ALERT → ACTION`.
+An existing React/Vite frontend and FastAPI backend for simulated payments and local UPI risk checks. It does not connect to a bank or move real money.
 
-The frontend decodes QR codes in the browser and sends them to the FastAPI backend
-for risk analysis. If the backend is unavailable, QR payloads use the browser's
-local rules and are clearly marked as on-device heuristic results. Payment-link
-and UPI-ID screens retain their browser rules.
+The frontend decodes QR codes in the browser and sends QR, UPI ID, URL, and payment
+analysis to the Python backend. Offline fallback results are labelled as local
+pattern checks. The simulator persists wallet balances, contacts, transactions,
+and fraud evidence per authenticated user.
 
 ## Run it
 
@@ -23,21 +22,24 @@ npm run check      # typecheck + score report + render smoke test
 python -m venv .venv
 # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -r backend/requirements.txt
-python -m uvicorn backend.main:app --reload
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8001 --reload
 ```
 
-The API is available at `http://localhost:8000`; interactive endpoint docs are
-at `http://localhost:8000/docs`. Check it with `python -m pytest backend/tests`.
+The API is available at `http://127.0.0.1:8001`; interactive endpoint docs are
+at `http://127.0.0.1:8001/docs`. New demo accounts start with ₹50,000 simulated
+funds. Check it with `python -m pytest backend/tests`.
 
 `POST /api/analyze/qr` accepts decoded JSON (`{"payload":"upi://pay?..."}`)
 or multipart form data with an `image` field. Set `VITE_API_URL` to the backend
 origin; the checked-in `.env.development` points local Vite development at
-`http://localhost:8000`.
+`http://127.0.0.1:8001`.
 `POST /api/analyze/url` accepts `{"url":"https://..."}`; and
 `POST /api/analyze/upi` accepts `{"upi_id":"name@provider"}`. Responses
 include `risk_score`, `risk_level`, `detected_threats`, `reasons`,
-`recipient_info`, and `recommended_action`. Analysis is local and heuristic;
-it does not contact domains, verify account ownership, or process payments.
+`recipient_info`, and `recommended_action`. Analysis uses local heuristics; it
+does not contact domains or verify account ownership. `/api/payments` processes
+simulated transfers only, with server-side validation, atomic debits, idempotency,
+and explicit confirmation for medium-risk requests.
 
 ## Deploy
 
@@ -55,10 +57,11 @@ service with root directory `.`, build command
 `https://upi-suraksha.vercel.app`. Add any extra trusted origins as a
 comma-separated list; wildcard CORS is rejected.
 
-The frontend falls back to local QR checks if the API URL is missing or the
-service cannot be reached. Set `VITE_API_URL` in Vercel and redeploy to use the
-hosted backend. Camera access on a phone requires HTTPS; use the deployed HTTPS
-site rather than the Vite server's plain-HTTP LAN address.
+Analysis screens fall back to clearly labelled local pattern checks if the API
+URL is missing or unreachable. Simulated payments require the configured API.
+Set `VITE_API_URL` in Vercel and redeploy to use the hosted backend. Camera
+access on a phone requires HTTPS; use the deployed HTTPS site rather than the
+Vite server's plain-HTTP LAN address.
 
 `VITE_API_URL` is a public frontend build-time URL, not a secret. Do not place
 API keys or credentials in Vite environment variables. `.env.example` lists the
@@ -76,13 +79,15 @@ different one: *UPI Vishwas* (विश्वास, trust), *UPI Rakshak*, *Pay
 
 | Route        | Screen                                                            |
 | ------------ | ----------------------------------------------------------------- |
-| `/`          | Home — **Secure Every UPI Payment** + running advisory ticker      |
+| `/`          | Home — simulated balance, saved contacts, Pay and Scan QR          |
+| `/wallet`    | Simulated balance and recent activity                              |
 | `/scan`      | QR scanner — **live camera decoding**, upload, paste               |
+| `/history`   | Persisted simulated transactions and fraud evidence                |
 | `/link`      | Check a payment link                                              |
 | `/upi`       | Verify a UPI ID                                                   |
 | `/analyse`   | Staged analysis progress                                          |
 | `/report`    | Fraud risk score 0–100, the five checks, suspicious indicators    |
-| `/decision`  | Alert — *Payment Risk Detected* / *Payment appears safe* + action |
+| `/decision`  | Risk alert and recommended action                                  |
 
 ## Live QR scanning
 
@@ -98,17 +103,23 @@ paint never pays for it.
 
 ## Colour system
 
-Razorpay-style navy for authority, with GPay's four accent colours used as
-**flat** blocks (no gradients) in a `.chipbar` strip on the masthead, the score
-card and the alert:
+A bright, premium light theme with **glassmorphism** cards (translucent white,
+backdrop blur, soft gradients and rounded corners), inspired by Google Pay's
+calm, trustworthy feel. The base is pastel sky blue, mint green, soft white and
+very light grey — there are no dark backgrounds. Saffron, white and green
+tricolour accents appear only as small highlights, decorative gradients and
+security indicators, and the flag colours are re-used as the risk scale (green
+= safe, amber = verify, red = blocked):
 
-| Token        | Role                 |
-| ------------ | -------------------- |
-| `--navy-900` | `#0c2340` authority  |
-| `--blue-600` | `#1a73e8` primary    |
-| `--ok-600`   | `#12a05c` verified   |
-| `--warn-600` | `#e8a400` review     |
-| `--risk-600` | `#d93025` blocked    |
+| Token             | Role                                      |
+| ----------------- | ----------------------------------------- |
+| `--navy-900`      | `#14385f` headings / strong text          |
+| `--blue-600`      | `#1a73e8` primary actions                |
+| `--ok-600`        | `#12a05c` verified / low risk            |
+| `--warn-600`      | `#e8a400` review / medium risk           |
+| `--risk-600`      | `#d93025` blocked / high risk            |
+| `--flag-saffron`  | `#ff9933` Indian identity accent         |
+| `--flag-green`    | `#138808` Indian identity accent         |
 
 ## How the score is produced
 
@@ -149,9 +160,10 @@ Prize claim UPI ID           HIGH     70/100
 
 ## Notes and limitations
 
-- **Demo branding.** "UPI Suraksha" and the "National Digital Payments Authority"
-  are fictional, and the footer says so. The flag mark and the cybercrime
-  helpline number **1930** are real.
+- **No identity provider.** Phone and UPI ownership lookups are not configured;
+  saved contacts and sample merchants are not identity verification.
+- **Demo branding.** UPI Suraksha is an independent demonstration, not a
+  Government of India service. Payments and wallet balances are simulated.
 - **Camera access needs a secure context.** `getUserMedia` only works on
   `localhost` or over HTTPS. Opening `dist/index.html` from `file://` will not
   start the camera — use `npm run dev` or `npm run preview`.

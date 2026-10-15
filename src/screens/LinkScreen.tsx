@@ -31,7 +31,7 @@ export function LinkScreen() {
           <span className="eyebrow">Step 1 &middot; Input</span>
           <h1 className="page__title">Check a payment link</h1>
           <p className="page__lede">
-            Paste the full link you received by SMS, email or chat. The address, the redirect chain
+            Paste the full link you received by SMS, email or chat. The address, visible redirect hints
             and the payee hidden inside it are checked before you open it.
           </p>
         </header>

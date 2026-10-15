@@ -46,13 +46,6 @@ export function MerchantRow({ merchant }: { merchant: Merchant }) {
         <span className="mrow__body">
           <span className="mrow__name">
             {merchant.name}
-            {merchant.verified ? (
-              <span className="tick" title="On the merchant registry" aria-label="Verified merchant">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4">
-                  <path d="m4.5 12.5 5 5 10-11" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
-            ) : null}
           </span>
           <span className="mrow__meta mono">{merchant.upiId}</span>
         </span>

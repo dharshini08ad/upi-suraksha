@@ -2,7 +2,7 @@
    CHROME — utility bar, masthead, navigation, stepper, footer
    ========================================================= */
 
-/* ---------- Four-colour accent bar ---------- */
+/* ---------- Tricolour-inspired accent bar ---------- */
 
 .chipbar {
   display: flex;
@@ -15,24 +15,27 @@
 }
 
 .chipbar__b {
-  background: var(--blue-600);
+  background: var(--flag-saffron);
 }
 .chipbar__g {
-  background: var(--ok-600);
+  background: var(--flag-white);
+  box-shadow: inset 0 -1px 0 var(--line);
 }
 .chipbar__y {
-  background: var(--warn-600);
+  background: var(--blue-600);
 }
 .chipbar__r {
-  background: var(--risk-600);
+  background: var(--flag-green);
 }
 
-/* ---------- Top utility bar ---------- */
+/* ---------- Top utility bar (light glass) ---------- */
 
 .utilbar {
-  background: var(--navy-950);
-  color: var(--ink-inv-2);
-  border-bottom: 1px solid var(--navy-800);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--glass-border-2);
 }
 
 .utilbar__inner {
@@ -54,17 +57,17 @@
 
 .utilbar__org .flag {
   flex: none;
-  border-radius: 1px;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--line-strong);
 }
 
 .utilbar__org strong {
-  color: #fff;
-  font-weight: 600;
+  color: var(--navy-900);
+  font-weight: 700;
 }
 
 .utilbar__divider {
-  color: #3d5b8c;
+  color: var(--line-navy);
 }
 
 .utilbar__meta {
@@ -80,14 +83,17 @@
   }
 }
 
-/* ---------- Masthead ---------- */
+/* ---------- Masthead (frosted glass navbar) ---------- */
 
 .masthead {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(12, 35, 64, 0.05);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.72));
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid var(--glass-border-2);
+  box-shadow: 0 2px 20px rgba(31, 79, 138, 0.06);
 }
 
 .masthead__inner {
@@ -129,8 +135,8 @@
   align-items: baseline;
   gap: 8px;
   font-size: 19px;
-  font-weight: 700;
-  letter-spacing: -0.005em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   color: var(--navy-900);
   line-height: 1.15;
 }
@@ -171,14 +177,16 @@
 .nav__link {
   display: inline-flex;
   align-items: center;
-  height: 38px;
-  padding: 0 14px;
-  border-radius: var(--r-md);
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--r-pill);
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ink-2);
   text-decoration: none;
   white-space: nowrap;
+  transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease,
+    transform 0.16s var(--ease-pop);
 }
 
 .nav__link:hover {
@@ -188,13 +196,14 @@
 }
 
 .nav__link.is-active {
-  background: var(--navy-900);
+  background: var(--grad-primary);
   color: #fff;
+  box-shadow: var(--shadow-brand);
 }
 
 .nav__link.is-active:hover {
-  background: var(--navy-800);
   color: #fff;
+  transform: translateY(-1px);
 }
 
 .nav__link--reset {
@@ -226,12 +235,14 @@
     align-items: stretch;
     gap: 0;
     padding: 8px 16px 14px;
-    background: #fff;
-    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--glass-border-2);
     box-shadow: var(--shadow-2);
   }
   .nav__link {
-    height: 44px;
+    height: 46px;
     border-radius: var(--r-md);
   }
   .nav.is-collapsed {
@@ -242,8 +253,10 @@
 /* ---------- Flow stepper ---------- */
 
 .stepper {
-  background: #fff;
-  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.6));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border-2);
 }
 
 .stepper__inner {
@@ -299,17 +312,21 @@
   color: var(--navy-900);
 }
 .step.is-current .step__num {
-  background: var(--navy-900);
-  border-color: var(--navy-900);
+  background: var(--grad-primary);
+  border-color: transparent;
   color: #fff;
+  box-shadow: var(--shadow-brand);
+}
 
 /* ---------- Footer ---------- */
 
 .footer {
   flex: none;
   margin-top: 40px;
-  background: #fff;
-  border-top: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.86));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--glass-border-2);
 }
 
 .footer__top {
@@ -373,9 +390,9 @@
   max-width: 80ch;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-left: 3px solid var(--navy-600);
-  border-radius: var(--r-sm);
-  background: var(--paper-alt);
+  border-left: 3px solid var(--blue-600);
+  border-radius: var(--r-md);
+  background: var(--glass);
   color: var(--ink-2);
   font-size: 12px;
   line-height: 1.5;
@@ -386,8 +403,6 @@
     grid-template-columns: 1fr;
     gap: 24px;
   }
-}
-
 }
 
 @media (max-width: 640px) {

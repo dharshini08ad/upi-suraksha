@@ -12,6 +12,7 @@ export interface Preflight {
   /** Short lines shown in the pay sheet. */
   reasons: string[]
   analysis: Analysis
+  analysis_source?: 'api' | 'local'
   /** The payload the engine actually scored. */
   payload: string
 }
@@ -20,7 +21,7 @@ export const VERDICT_COPY: Record<
   Verdict,
   { label: string; tone: 'ok' | 'warn' | 'risk'; action: string }
 > = {
-  CLEAR: { label: 'Safe to pay', tone: 'ok', action: 'Pay' },
+  CLEAR: { label: 'No high-risk patterns detected', tone: 'ok', action: 'Pay' },
   VERIFY: { label: 'Verify before paying', tone: 'warn', action: 'Pay anyway' },
   BLOCK: { label: 'Payment risk detected', tone: 'risk', action: 'Payment blocked' },
 }

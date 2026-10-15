@@ -8,6 +8,7 @@ from starlette.datastructures import UploadFile
 from backend.engine import RiskAnalyzer
 from backend.qr_decoder import decode_qr_image
 from backend.schemas import AnalysisResponse, QrAnalysisRequest, UpiAnalysisRequest, UrlAnalysisRequest
+from backend.simulator import router as simulator_router
 
 
 logging.basicConfig(
@@ -17,6 +18,16 @@ logging.basicConfig(
 logger = logging.getLogger("upi_fraud_api")
 analyzer = RiskAnalyzer()
 
+try:
+    from backend import db as _db
+
+    _db.init_db()
+    logger.info("Simulator database initialised (migrations applied).")
+except Exception:  # pragma: no cover - surfaced at startup
+    logger.exception("Failed to initialise simulator database")
+    raise
+
+
 app = FastAPI(
     title="UPI Phishing and Fraud Detection API",
     version="1.0.0",
@@ -24,6 +35,11 @@ app = FastAPI(
 )
 environment = os.getenv("ENVIRONMENT", "development").casefold()
 default_origins = "" if environment == "production" else "http://localhost:5173,http://127.0.0.1:5173"
+dev_origin_regex = (
+    r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+    if environment != "production"
+    else None
+)
 origins = [
     origin.strip().rstrip("/")
     for origin in os.getenv("CORS_ORIGINS", default_origins).split(",")
@@ -34,10 +50,12 @@ if "*" in origins:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=dev_origin_regex,
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["Content-Type", "Authorization"],
 )
+app.include_router(simulator_router)
 
 
 @app.get("/api/health")

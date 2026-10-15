@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Stepper } from '../components/Stepper'
 import { SampleList } from '../components/SampleList'
 import {
@@ -8,12 +9,15 @@ import {
   IconClipboard,
   IconInfo,
   IconQr,
+  IconShieldAlert,
   IconUpload,
 } from '../components/Icons'
 import { samplesFor } from '../data/samples'
 import { decodeQr, scanUntilFound } from '../lib/qr'
-import { analyzeQrImage, analyzeQrPayload } from '../lib/api'
+import { analyzeQrImage, analyzeQrPayload, saveContact } from '../lib/api'
 import type { QrAnalysisResult } from '../lib/api'
+import { useAnalytics } from '../state/analytics'
+import { useOptionalWallet } from '../state/wallet'
 
 type CameraState = 'idle' | 'starting' | 'live' | 'denied' | 'unsupported' | 'error'
 
@@ -75,6 +79,11 @@ export function ScanScreen() {
   const mountedRef = useRef(true)
   const cameraAttemptRef = useRef(0)
 
+  const { recordScan } = useAnalytics()
+  const wallet = useOptionalWallet()
+  const user = wallet?.user ?? null
+  const [recipientSaved, setRecipientSaved] = useState(false)
+
   const stopCamera = useCallback(() => {
     cameraAttemptRef.current += 1
     stopScanRef.current?.()
@@ -107,12 +116,15 @@ export function ScanScreen() {
     }
     setError(null)
     setResult(null)
+    setRecipientSaved(false)
     setHit(trimmed)
     stopCamera()
     setCamera('idle')
     setAnalyzing(true)
     try {
-      setResult(await analyzeQrPayload(trimmed))
+      const analysis = await analyzeQrPayload(trimmed)
+      setResult(analysis)
+      recordScan(analysis.risk_level !== 'LOW')
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'QR analysis failed. Try again or upload the image.')
     } finally {
@@ -126,6 +138,7 @@ export function ScanScreen() {
     setError(null)
     setHit(null)
     setResult(null)
+    setRecipientSaved(false)
     setScanHint(false)
     if (!navigator.mediaDevices?.getUserMedia) {
       setCamera('unsupported')
@@ -195,6 +208,7 @@ export function ScanScreen() {
     setError(null)
     setHit(null)
     setResult(null)
+    setRecipientSaved(false)
     setAnalyzing(true)
     stopCamera()
     setCamera('idle')
@@ -203,10 +217,26 @@ export function ScanScreen() {
       const analysis = payload ? await analyzeQrPayload(payload) : await analyzeQrImage(file)
       setHit(payload ?? analysis.analyzed_value)
       setResult(analysis)
+      recordScan(analysis.risk_level !== 'LOW')
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'That image could not be analyzed. Try a clearer QR photo.')
     } finally {
       setAnalyzing(false)
+    }
+  }
+
+  async function saveScannedRecipient() {
+    const upiId = result?.recipient_info.upi_id
+    if (!upiId || !result?.is_valid) return
+    try {
+      await saveContact({
+        name: result.recipient_info.payee_name || upiId,
+        upi_id: upiId,
+        verified: false,
+      })
+      setRecipientSaved(true)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not save this recipient.')
     }
   }
 
@@ -323,6 +353,13 @@ export function ScanScreen() {
               </div>
             </div>
 
+            {result.risk_level !== 'LOW' ? (
+              <p className="qr-result__banner" role="alert">
+                <IconShieldAlert size={18} />
+                Potential Fraud Detected — Verify Before You Pay.
+              </p>
+            ) : null}
+
             <p className="qr-result__source-note">
               {result.analysis_source === 'local' ? 'On-device pattern check.' : 'Pattern-based analysis.'} It cannot
               confirm account ownership or guarantee safety; verify the payee and amount in your UPI app before paying.
@@ -339,6 +376,26 @@ export function ScanScreen() {
             <ul className="qr-result__reasons">
               {result.reasons.map((reason, index) => <li key={`${index}-${reason}`}>{reason}</li>)}
             </ul>
+            {result.recipient_info.upi_id && result.is_valid ? (
+              <div className="btn-row">
+                <Link
+                  className="btn btn--primary"
+                  to={`/pay/recipient?upi=${encodeURIComponent(result.recipient_info.upi_id)}&name=${encodeURIComponent(result.recipient_info.payee_name || result.recipient_info.upi_id)}&amount=${encodeURIComponent(result.recipient_info.amount?.toString() ?? '')}&payload=${encodeURIComponent(hit ?? result.analyzed_value)}`}
+                >
+                  Review simulated payment
+                </Link>
+                {user ? (
+                  <button
+                    type="button"
+                    className="btn btn--outline"
+                    disabled={recipientSaved}
+                    onClick={() => void saveScannedRecipient()}
+                  >
+                    {recipientSaved ? 'Recipient saved' : 'Save recipient'}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
           </section>
         ) : null}
 
